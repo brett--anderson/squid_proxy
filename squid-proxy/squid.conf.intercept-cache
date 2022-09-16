@@ -1,11 +1,8 @@
 http_port 3128 ssl-bump \
-  cert=/apps/server_crt.pem key=/apps/server_key.pem \
+  cert=/apps/squid-ca-cert.pem key=/apps/squid-ca-key.pem \
   generate-host-certificates=on dynamic_cert_mem_cache_size=4MB
-sslcrtd_program /apps/squid/libexec/security_file_certgen -s /apps/squid/var/lib/ssl_db -M 4MB sslcrtd_children 8 startup=1 idle=1 
 
-acl step1 at_step SslBump1
-ssl_bump peek step1
-ssl_bump bump all
+sslcrtd_program /apps/squid/libexec/security_file_certgen -s /apps/squid/var/lib/ssl_db -M 4MB sslcrtd_children 8 startup=1 idle=1 
 
 acl localnet src 10.0.0.0/8     # RFC1918 possible internal network
 acl localnet src 172.16.0.0/12  # RFC1918 possible internal network
@@ -42,5 +39,5 @@ http_access allow localhost
 http_access deny all
 refresh_pattern . 525600 100% 525600 ignore-reload ignore-no-store ignore-private ignore-auth ignore-must-revalidate store-stale
 
-cache_peer proxy.crawlera.com parent 8010 0 login=CRAWLERA_API_KEY:
+cache_peer mantic.crawlera.com parent 8010 0 ssl login=CRAWLERA_API_KEY:
 never_direct allow all
